@@ -14,8 +14,9 @@
 
     Positions on the board are numbered from 0 to 8
 
-    Instance method update(move, field) will update the board_status array based on the field and a x or o
-    Instance method reset will empty contents of a board_status array
+    Instance method update(move, field) will update the board_status array based on the field and a x or o.
+
+    Instance variable full? will check if all fields are filled and it will mean that it's a draw
 
     ----------------------------------------------------------------------------------------------------------
 
@@ -111,7 +112,7 @@ class Game
             @player_two.turn = true
         end
 
-        until over?
+        until over? || @board.draw?
             board.to_s
 
             # Check whose turn it is and change it after the user played his move
@@ -119,7 +120,14 @@ class Game
                 puts "Do your thing #{@player_one.name}: "
                 field = gets.chomp.to_sym
                 begin
-                    board.update(@player_one.symbol, FIELDS[field])
+                    if @board.board_status[FIELDS[field]] != 'x' && @board.board_status[FIELDS[field]] != 'o'
+                        board.update(@player_one.symbol, FIELDS[field]) 
+                    else
+                        puts ""
+                        puts "That field is already filled"
+                        puts ""
+                        next
+                    end
                 rescue TypeError
                     puts ""
                     puts "Please enter one of the acceptable commands: "
@@ -133,7 +141,14 @@ class Game
                 puts "Do your thing #{@player_two.name}: "
                 field = gets.chomp.to_sym
                 begin
-                    board.update(@player_two.symbol, FIELDS[field])
+                    if @board.board_status[FIELDS[field]] != 'x' && @board.board_status[FIELDS[field]] != 'o'
+                        board.update(@player_two.symbol, FIELDS[field])
+                    else
+                        puts ""
+                        puts "That field is already filled"
+                        puts ""
+                        next
+                    end
                 rescue TypeError
                     puts ""
                     puts "Please enter one of the acceptable commands: "
@@ -146,8 +161,12 @@ class Game
             end
         end
 
-        puts 
-        puts "And the winner is..... #{winner.name} with a #{winner.symbol} symbol"
+        puts ""
+        if @winner
+            puts "And the winner is..... #{@winner.name} with a #{@winner.symbol} symbol"
+        else 
+            puts "It's a draw"
+        end
         board.to_s
     end
 end
@@ -173,8 +192,8 @@ class Board
         @board_status[field] = move
     end
 
-    def reset 
-        @board_status = []
+    def draw?
+        @board_status.compact.length == 9 ? true : false
     end
 
     def to_s
