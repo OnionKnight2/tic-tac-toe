@@ -30,6 +30,8 @@
     Users will first be asked what their name is and they will be given a random symbol (x or o) each.
     Then, until the game's not over, users will be prompted to enter their symbol into the field they want
 
+    When user inputs a place where he wants to put their symbol, there is a check for a TypeError in begin..rescue block
+
     ----------------------------------------------------------------------------------------------------------
 
     Define a class Player that will initialize a player with his name.
@@ -83,9 +85,11 @@ class Game
         @player_one.name = gets.chomp
         puts "Player 2, please enter your name:"
         @player_two.name = gets.chomp
+        sleep(1)
+        puts ""
         puts "Welcome #{@player_one.name} and #{@player_two.name}. You will now recieve your symbols."
         puts ""
-        sleep(1)
+        sleep(2)
 
         @player_one.symbol = OPTIONS.sample
         @player_two.symbol = (OPTIONS.select {|symbol| symbol != @player_one.symbol}).join  # select the one who the other player didn't get
@@ -93,12 +97,12 @@ class Game
         puts "#{@player_one.name}'s symbol is #{@player_one.symbol}"
         puts "#{@player_two.name}'s symbol is #{@player_two.symbol}"
         puts ""
-        sleep(1)
+        sleep(2)
 
         puts "When prompted, please enter one of the following commands: "
         puts FIELDS.keys.join("   ")
         puts ""
-        sleep(1)
+        sleep(2)
 
         # x always goes first
         if @player_one.symbol == 'x'
@@ -110,18 +114,35 @@ class Game
         until over?
             board.to_s
 
+            # Check whose turn it is and change it after the user played his move
             if @player_one.turn
                 puts "Do your thing #{@player_one.name}: "
                 field = gets.chomp.to_sym
-                board.update(@player_one.symbol, FIELDS[field])
-                @player_one.turn = false
-                @player_two.turn = true
+                begin
+                    board.update(@player_one.symbol, FIELDS[field])
+                rescue TypeError
+                    puts ""
+                    puts "Please enter one of the acceptable commands: "
+                    puts FIELDS.keys.join("   ")
+                    puts ""
+                else
+                    @player_one.turn = false
+                    @player_two.turn = true
+                end
             else 
                 puts "Do your thing #{@player_two.name}: "
                 field = gets.chomp.to_sym
-                board.update(@player_two.symbol, FIELDS[field])
-                @player_one.turn = true
-                @player_two.turn = false
+                begin
+                    board.update(@player_two.symbol, FIELDS[field])
+                rescue TypeError
+                    puts ""
+                    puts "Please enter one of the acceptable commands: "
+                    puts FIELDS.keys.join("   ")
+                    puts ""
+                else              
+                    @player_one.turn = true
+                    @player_two.turn = false
+                end
             end
         end
 
