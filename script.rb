@@ -41,14 +41,14 @@
 
     ----------------------------------------------------------------------------------------------------------
 
-    Create a module called Help that will contain all the helper methods and classes other than Game
+    Create a module called TicTacToe that will contain all the helper methods and classes
 
     ----------------------------------------------------------------------------------------------------------
 =end
 
 require 'pry-byebug'
 
-module Help
+module TicTacToe
     WINS = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Horizontal wins
         [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Vertical wins
@@ -173,45 +173,45 @@ module Help
         end
         board.to_s
     end
-end
 
-class Game
-    include Help
-
-    attr_reader :board, :player_one, :player_two, :winner
-
-    def initialize
-        @board = Board.new
-        @player_one = Player.new
-        @player_two = Player.new
-        @winner = nil
-    end
-
-    def over?
-        WINS.any? do |line| 
-            check_win(line, board, player_one, winner) || check_win(line, board, player_two, winner)
+    class Game
+        attr_reader :board, :player_one, :player_two, :winner
+    
+        def initialize
+            @board = Board.new
+            @player_one = Player.new
+            @player_two = Player.new
+            @winner = nil
         end
-    end
-
-    def play 
-        intro(player_one, player_two)
-
-        # x always goes first
-        check_symbol(player_one, player_two)
-
-        until over? || board.filled?
-            board.to_s
-
-            if player_one.turn 
-                play_round(player_one, player_two, board)
-            elsif player_two.turn
-                play_round(player_two,player_one, board)
+    
+        def over?
+            WINS.any? do |line| 
+                check_win(line, board, player_one, winner) || check_win(line, board, player_two, winner)
             end
         end
-
-        finish_game(winner, board)
+    
+        def play 
+            intro(player_one, player_two)
+    
+            # x always goes first
+            check_symbol(player_one, player_two)
+    
+            until over? || board.filled?
+                board.to_s
+    
+                if player_one.turn 
+                    play_round(player_one, player_two, board)
+                elsif player_two.turn
+                    play_round(player_two,player_one, board)
+                end
+            end
+    
+            finish_game(winner, board)
+        end
     end
 end
+
+include TicTacToe
 
 game = Game.new
 game.play()
